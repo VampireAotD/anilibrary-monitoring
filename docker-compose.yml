@@ -2,8 +2,8 @@ version: '3.9'
 
 services:
   prometheus:
-    image: prom/prometheus:v2.40.0
-    container_name: prometheus
+    image: prom/prometheus
+    container_name: anilibrary-prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     volumes:
@@ -20,12 +20,24 @@ services:
       - local
       - shared
 
+  alertmanager:
+    image: prom/alertmanager
+    container_name: anilibrary-alertmanager
+    profiles:
+      - alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    networks:
+      - local
+
   grafana:
-    image: grafana/grafana:9.3.1
+    image: grafana/grafana
     depends_on:
       prometheus:
         condition: service_healthy
-    container_name: grafana
+    container_name: anilibrary-grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
@@ -34,9 +46,27 @@ services:
       - "3005:3000"
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/provisioning:/etc/grafana/provisioning
     networks:
       - local
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: anilibrary-jaeger
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:14269 || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14269:14269"
+      - "9412:9412"
+    networks:
+      - local
+      - shared
 
 volumes:
   grafana-data:

@@ -5,7 +5,7 @@ datasources:
     type: prometheus
     orgId: 1
     access: proxy
-    url: http://prometheus:9090
+    url: http://anilibrary-prometheus:9090
     basicAuth: false
     isDefault: true
     editable: true

@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  elasticsearch-exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter
+    container_name: anilibrary-elasticsearch-exporter
+    command:
+      - '--es.uri=${ELASTICSEARCH_URL}'
+    ports:
+      - "9114:9114"
+    networks:
+      - shared
+
+networks:
+  shared:
+    name: anilibrary
+    external: true

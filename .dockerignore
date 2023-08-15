@@ -1,4 +1,9 @@
+alertmanager/alertmanager.template.yml
+scripts
 .env.example
+.gitignore
+docker-compose.exporters.yml
+docker-compose.yml
 LICENSE
 Makefile
-docker-compose.yml
+README.md
