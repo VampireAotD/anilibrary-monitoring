@@ -1,5 +1,7 @@
-alertmanager/alertmanager.template.yml
+.idea
+.github
 scripts
+alertmanager/alertmanager.template.yml
 .env.example
 .gitignore
 docker-compose.exporters.yml

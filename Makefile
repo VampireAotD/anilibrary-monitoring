@@ -20,4 +20,5 @@ up-exporters:
 
 .PHONY: up-alertmanager
 up-alertmanager:
+	@make alertmanager-config
 	docker-compose --profile=alertmanager up --build
