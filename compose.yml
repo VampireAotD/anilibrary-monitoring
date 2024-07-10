@@ -1,80 +1,89 @@
-version: '3.9'
-
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:${PROMETHEUS_VERSION}
     container_name: anilibrary-prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-    volumes:
-      - prometheus-data:/prometheus
-      - ./prometheus:/etc/prometheus
     ports:
-      - "9090:9090"
+      - ${PROMETHEUS_PORT}:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:9090/-/healthy || exit 1
-      interval: 2s
-      timeout: 2s
+      interval: 5s
+      timeout: 5s
       retries: 5
     networks:
       - local
       - shared
 
   alertmanager:
-    image: prom/alertmanager
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    image: prom/alertmanager:${ALERTMANAGER_VERSION}
     container_name: anilibrary-alertmanager
     profiles:
       - alertmanager
     command:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - ${ALERTMANAGER_PORT}:9093
     volumes:
       - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
     networks:
       - local
 
   grafana:
-    image: grafana/grafana
     depends_on:
       prometheus:
         condition: service_healthy
+    image: grafana/grafana:${GRAFANA_VERSION}
     container_name: anilibrary-grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
-      - GF_SECURITY_ALLOW_SING_UP=false
     ports:
-      - "3005:3000"
+      - ${GRAFANA_PORT}:3000
     volumes:
-      - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
-    networks:
-      - local
-
-  jaeger:
-    image: jaegertracing/all-in-one
-    container_name: anilibrary-jaeger
+      - grafana-data:/var/lib/grafana
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:14269 || exit 1
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000/healthz || exit 1
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - local
+
+  tempo:
+    image: grafana/tempo:${TEMPO_VERSION}
+    container_name: anilibrary-tempo
+    command:
+      - '-config.file=/etc/tempo.yml'
+      - '-config.expand-env=true'
+    volumes:
+      - ./tempo/tempo.yml:/etc/tempo.yml
+      - tempo-data:/var/tempo
     ports:
-      - "5778:5778"
-      - "16686:16686"
-      - "14268:14268"
-      - "14269:14269"
-      - "9412:9412"
+      - ${TEMPO_PORT}:3200
+      - ${TEMPO_OTLP_HTTP_PORT}:4318
     networks:
       - local
       - shared
 
 volumes:
-  grafana-data:
   prometheus-data:
+    name: anilibrary-prometheus-data
+  grafana-data:
+    name: anilibrary-grafana-data
+  tempo-data:
+    name: anilibrary-tempo-data
 
 networks:
   local:
-    driver: bridge
+    name: anilibrary-monitoring-local
   shared:
     name: anilibrary
     external: true

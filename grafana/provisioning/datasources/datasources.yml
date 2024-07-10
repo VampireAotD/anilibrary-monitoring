@@ -1,0 +1,42 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    orgId: 1
+    version: 1
+    url: http://anilibrary-prometheus:9090
+    basicAuth: false
+    isDefault: true
+    editable: false
+    jsonData:
+      httpMethod: GET
+
+  - name: Alertmanager
+    type: alertmanager
+    uid: alertmanager
+    access: proxy
+    orgId: 1
+    version: 1
+    url: http://alertmanager:9093
+    basicAuth: false
+    isDefault: false
+    editable: false
+    jsonData:
+      httpMethod: GET
+
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    access: proxy
+    orgId: 1
+    version: 1
+    url: http://anilibrary-tempo:3200
+    basicAuth: false
+    isDefault: false
+    editable: false
+    apiVersion: 1
+    jsonData:
+      httpMethod: GET

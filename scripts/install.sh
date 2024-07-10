@@ -29,8 +29,10 @@ compose=$(set_compose_bin) || {
 
 echo '⠿ Installing Anilibrary Monitoring'
 
-log 'Creating .env file with values from .env.example'
-cp ./.env.example ./.env
+if [ ! -f ./.env ]; then
+  log 'Creating .env file with values from .env.example'
+  cp ./.env.example ./.env
+fi
 
 log 'Resolving Alertmanager config'
 chmod +x ./scripts/alertmanager/create_config.sh

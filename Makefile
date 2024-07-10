@@ -8,17 +8,17 @@ alertmanager-config:
 
 .PHONY: down
 down:
-	docker-compose down --remove-orphans
+	docker compose down --remove-orphans
 
 .PHONY: up
 up:
-	docker-compose up --build
+	docker compose up --build
 
 .PHONY: up-exporters
 up-exporters:
-	docker-compose -f docker-compose.exporters.yml up --build
+	docker compose -f docker-compose.exporters.yml up --build
 
 .PHONY: up-alertmanager
 up-alertmanager:
 	@make alertmanager-config
-	docker-compose --profile=alertmanager up --build
+	docker compose --profile=alertmanager up --build

@@ -4,8 +4,8 @@ scripts
 alertmanager/alertmanager.template.yml
 .env.example
 .gitignore
-docker-compose.exporters.yml
-docker-compose.yml
+compose.exporters.yml
+compose.yml
 LICENSE
 Makefile
 README.md
