@@ -18,23 +18,6 @@ services:
       - local
       - shared
 
-  alertmanager:
-    depends_on:
-      prometheus:
-        condition: service_healthy
-    image: prom/alertmanager:${ALERTMANAGER_VERSION}
-    container_name: anilibrary-alertmanager
-    profiles:
-      - alertmanager
-    command:
-      - '--config.file=/etc/alertmanager/alertmanager.yml'
-    ports:
-      - ${ALERTMANAGER_PORT}:9093
-    volumes:
-      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
-    networks:
-      - local
-
   grafana:
     depends_on:
       prometheus:
@@ -69,6 +52,47 @@ services:
     ports:
       - ${TEMPO_PORT}:3200
       - ${TEMPO_OTLP_HTTP_PORT}:4318
+    networks:
+      - local
+      - shared
+
+  alertmanager:
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    build:
+      context: ./alertmanager
+      args:
+        ALERTMANAGER_VERSION: ${ALERTMANAGER_VERSION}
+    container_name: anilibrary-alertmanager
+    env_file:
+      - .env
+    profiles:
+      - alerts
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - ${ALERTMANAGER_PORT}:9093
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:9093/-/healthy || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - local
+
+  elasticsearch-exporter:
+    depends_on:
+      alertmanager:
+        condition: service_healthy
+    image: quay.io/prometheuscommunity/elasticsearch-exporter
+    container_name: anilibrary-elasticsearch-exporter
+    profiles:
+      - alerts
+    command:
+      - '--es.uri=${ELASTICSEARCH_URL}'
+    ports:
+      - ${ELASTICSEARCH_EXPORTER_PORT}:9114
     networks:
       - local
       - shared

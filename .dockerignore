@@ -1,10 +1,10 @@
 .idea
 .github
 scripts
-alertmanager/alertmanager.template.yml
+alertmanager/Dockerfile
+.dockerignore
 .env.example
 .gitignore
-compose.exporters.yml
 compose.yml
 LICENSE
 Makefile
