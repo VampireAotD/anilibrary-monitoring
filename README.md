@@ -63,7 +63,7 @@ To launch **Monitoring** use command:
 make up
 ```
 
-It wii launch all containers except for **Alertmanager**. To launch it and exporters for alerts use command:
+It will launch all containers except for **Alertmanager**. To launch it and exporters for alerts use command:
 
 ```sh
 make alerts
