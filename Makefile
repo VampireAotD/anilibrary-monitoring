@@ -18,3 +18,11 @@ down: ## Stop all containers
 .PHONY: alerts
 alerts: ## Launch Monitoring with Alertmanager and exporters
 	docker compose --profile alerts up -d --build
+
+.PHONY: validate-prometheus-config
+validate-prometheus-config: ## Validate Prometheus config
+	docker compose exec prometheus promtool check config /etc/prometheus/prometheus.yml
+
+.PHONY: validate-alertmanager-config
+validate-alertmanager-config: ## Validate Alertmanager config
+	docker compose exec alertmanager amtool check-config /etc/alertmanager/alertmanager.yml
