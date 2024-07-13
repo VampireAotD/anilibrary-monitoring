@@ -2,4 +2,8 @@ pre-commit:
   parallel: true
   commands:
     prometheus:
+      glob: "prometheus/**"
       run: make validate-prometheus-config
+    alertmanager:
+      glob: "alertmanager/**"
+      run: make validate-alertmanager-config

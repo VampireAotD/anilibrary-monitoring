@@ -2,7 +2,7 @@ global:
   resolve_timeout: 2m
 
 templates:
-  - '/etc/alertmanager/template/*.tmpl'
+  - '/etc/alertmanager/templates/*.tmpl'
 
 route:
   group_by: [ 'alertname', 'service' ]
@@ -12,20 +12,15 @@ route:
   receiver: email
 
   routes:
-    - matchers:
-        - severity="info|warning"
-      receiver: email
+    - receiver: 'email'
+      matchers:
+        - severity=info|warning
 
-    - matchers:
-        - severity="critical"
-      receiver: telegram
+    - receiver: 'telegram'
+      matchers:
+        - severity=critical
 
 receivers:
-  - name: 'telegram'
-    telegram_configs:
-      - bot_token: ${TELEGRAM_BOT_TOKEN}
-        chat_id: ${TELEGRAM_CHAT_ID}
-
   - name: 'email'
     email_configs:
       - to: ${MAIL_RECEIVER}
@@ -33,4 +28,10 @@ receivers:
         smarthost: ${MAIL_HOST}
         auth_username: ${MAIL_USERNAME}
         auth_password: ${MAIL_PASSWORD}
+        send_resolved: true
+
+  - name: 'telegram'
+    telegram_configs:
+      - bot_token: ${TELEGRAM_BOT_TOKEN}
+        chat_id: ${TELEGRAM_CHAT_ID}
         send_resolved: true

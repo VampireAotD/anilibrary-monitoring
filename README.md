@@ -68,3 +68,18 @@ It will launch all containers except for **Alertmanager**. To launch it and expo
 ```sh
 make alerts
 ```
+
+### Hooks
+
+To validate **Prometheus** or **Alertmanager** configs use following commands:
+
+```sh
+make validate-prometheus-config
+```
+
+```sh
+make validate-alertmanager-config
+```
+
+To do it automatically before commit, **Monitoring** uses [Lefthook](https://github.com/evilmartians/lefthook), so you
+must install it as well.
