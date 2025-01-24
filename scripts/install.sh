@@ -7,14 +7,22 @@ function log {
   echo "[+] $1"
 }
 
-echo '⠿ Installing Anilibrary Monitoring'
+function info {
+  echo "⠿ $1"
+}
+
+function err {
+  echo "[x] $1" >&2
+}
+
+info 'Installing Anilibrary Monitoring'
 
 if [ ! -f ./.env ]; then
-  log 'Creating .env file with values from .env.example'
-  cp ./.env.example ./.env
+  err '.env file not found'
+  exit 1
 fi
 
 log 'Building images and launching Monitoring (without alerts)'
 make up
 
-echo '⠿ Anilibrary Monitoring has been successfully installed!'
+info 'Anilibrary Monitoring has been successfully installed!'
