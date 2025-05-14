@@ -40,3 +40,18 @@ datasources:
     apiVersion: 1
     jsonData:
       httpMethod: GET
+
+  - name: Pyroscope
+    type: grafana-pyroscope-datasource
+    uid: pyroscope
+    access: proxy
+    orgId: 1
+    version: 1
+    url: http://anilibrary-pyroscope:4040
+    basicAuth: false
+    isDefault: false
+    editable: false
+    apiVersion: 1
+    jsonData:
+      httpMethod: GET
+      minStep: '15s'
