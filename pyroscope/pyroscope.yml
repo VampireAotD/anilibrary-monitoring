@@ -1,0 +1,8 @@
+target: all
+
+server:
+  log_level: info
+
+pyroscopedb:
+  data_path: "./data"
+  max_block_duration: 1h

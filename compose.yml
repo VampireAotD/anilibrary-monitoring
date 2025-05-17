@@ -1,61 +1,4 @@
 services:
-  prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION}
-    container_name: anilibrary-prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - ${PROMETHEUS_PORT}:9090
-    volumes:
-      - ./prometheus:/etc/prometheus
-      - prometheus-data:/prometheus
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:9090/-/healthy || exit 1
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - local
-      - shared
-
-  grafana:
-    depends_on:
-      prometheus:
-        condition: service_healthy
-    image: grafana/grafana:${GRAFANA_VERSION}
-    container_name: anilibrary-grafana
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
-    ports:
-      - ${GRAFANA_PORT}:3000
-    volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - grafana-data:/var/lib/grafana
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:3000/healthz || exit 1
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - local
-
-  tempo:
-    image: grafana/tempo:${TEMPO_VERSION}
-    container_name: anilibrary-tempo
-    command:
-      - '-config.file=/etc/tempo.yml'
-      - '-config.expand-env=true'
-    volumes:
-      - ./tempo/tempo.yml:/etc/tempo.yml
-      - tempo-data:/var/tempo
-    ports:
-      - ${TEMPO_PORT}:3200
-      - ${TEMPO_OTLP_HTTP_PORT}:4318
-    networks:
-      - local
-      - shared
-
   alertmanager:
     depends_on:
       prometheus:
@@ -97,6 +40,77 @@ services:
       - local
       - shared
 
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION}
+    container_name: anilibrary-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - ${PROMETHEUS_PORT}:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:9090/-/healthy || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - local
+      - shared
+
+  tempo:
+    image: grafana/tempo:${TEMPO_VERSION}
+    container_name: anilibrary-tempo
+    command:
+      - '-config.file=/etc/tempo.yml'
+      - '-config.expand-env=true'
+    volumes:
+      - ./tempo/tempo.yml:/etc/tempo.yml
+      - tempo-data:/var/tempo
+    ports:
+      - ${TEMPO_PORT}:3200
+      - ${TEMPO_OTLP_HTTP_PORT}:4318
+    networks:
+      - local
+      - shared
+
+  pyroscope:
+    image: grafana/pyroscope:${PYROSCOPE_VERSION}
+    container_name: anilibrary-pyroscope
+    command:
+      - '-config.file=/etc/pyroscope/pyroscope.yml'
+      - '-usage-stats.enabled=false'
+    volumes:
+      - ./pyroscope/pyroscope.yml:/etc/pyroscope/pyroscope.yml
+      - pyroscope-data:/data
+    ports:
+      - ${PYROSCOPE_PORT}:4040
+    networks:
+      - local
+
+  grafana:
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    image: grafana/grafana:${GRAFANA_VERSION}
+    container_name: anilibrary-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+    ports:
+      - ${GRAFANA_PORT}:3000
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000/healthz || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - local
+
 volumes:
   prometheus-data:
     name: anilibrary-prometheus-data
@@ -104,6 +118,8 @@ volumes:
     name: anilibrary-grafana-data
   tempo-data:
     name: anilibrary-tempo-data
+  pyroscope-data:
+    name: anilibrary-pyroscope-data
 
 networks:
   local:
